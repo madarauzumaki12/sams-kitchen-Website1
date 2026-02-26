@@ -1,8 +1,9 @@
 [build]
 builder = "nixpacks"
+rootDirectory = "sams-kitchen-backend"
 
 [deploy]
-startCommand = "cd sams-kitchen-backend && npm install && npm start"
+startCommand = "npm install && npm start"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
