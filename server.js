@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 // MIDDLEWARE
 // ============================================
 app.use(cors({
-  origin: ['https://your-vercel-url.vercel.app', 'http://localhost:5173'],
+  origin: ['https://sams-kitchen-frontend.vercel.app', 'http://localhost:5173'],
   credentials: true
 }));
 app.use(express.json());
