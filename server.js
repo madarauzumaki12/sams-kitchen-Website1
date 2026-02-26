@@ -706,6 +706,10 @@ app.use((req, res) => {
   }
   res.sendFile(path.join(__dirname, '../app/dist/index.html'));
 });
+// ✅ Health check endpoint HERE
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // ============================================
 // START SERVER
