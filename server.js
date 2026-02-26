@@ -17,7 +17,10 @@ const PORT = process.env.PORT || 3000;
 // ============================================
 // MIDDLEWARE
 // ============================================
-app.use(cors());
+app.use(cors({
+  origin: ['https://your-vercel-url.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -373,11 +376,7 @@ async function sendOrderEmails(order, items) {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: "SAM'S KITCHEN API is running!",
-    timestamp: new Date().toISOString()
-  });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // Get all products
