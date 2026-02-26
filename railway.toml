@@ -1,6 +1,5 @@
 [build]
 builder = "nixpacks"
-rootDirectory = "sams-kitchen-backend"
 
 [deploy]
 startCommand = "npm install && npm start"
