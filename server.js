@@ -710,14 +710,14 @@ app.use((req, res) => {
 // ============================================
 // START SERVER
 // ============================================
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║                                                        ║
 ║           🍴 SAM'S KITCHEN API SERVER 🍴               ║
 ║                                                        ║
-║   Server running on: http://localhost:${PORT}            ║
-║   Health check: http://localhost:${PORT}/api/health      ║
+║   Server running on: http://0.0.0.0:${PORT}            ║
+║   Health check: http://0.0.0.0:${PORT}/api/health      ║
 ║                                                        ║
 ╚════════════════════════════════════════════════════════╝
   `);
