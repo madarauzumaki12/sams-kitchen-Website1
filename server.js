@@ -666,51 +666,32 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
     } catch (emailError) {
       console.error('Order email send failed:', emailError.message);
     }**/
-      // Send to Discord
+   // Send to Discord
+    // Send to Discord
     try {
+      // Format items list
       const itemsList = normalizedItems.map(item => 
-        `• ${item.name} x${item.quantity} — Rs ${item.price * item.quantity}`
+        `• ${item.name} x${item.quantity} - Rs ${item.price * item.quantity}`
       ).join('\n');
 
       await fetch(process.env.DISCORD_WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: "🍴 Sam's Kitchen",
-          avatar_url: "logo.jpg", // Optional: add your logo URL
+          username: "Sam's Kitchen Bot",
           embeds: [{
-            title: `🛒 Order #${orderNumber}`,
-            description: `New order from **${cleanArea}**`,
-            color: 0x8e5d3d, // Warm brown
-            thumbnail: {
-              url: "logo.jpg" // Optional
-            },
+            title: `🛒 New Order #${orderNumber}`,
+            color: 0x8e5d3d,
             fields: [
-              {
-                name: "👤 Customer Details",
-                value: `**Name:** ${cleanCustomerName}\n**Phone:** ${cleanCustomerPhone}\n**Email:** ${cleanCustomerEmail || 'N/A'}`,
-                inline: false
-              },
-              {
-                name: "🛍️ Order Items",
-                value: itemsList.substring(0, 1024) || 'No items',
-                inline: false
-              },
-              {
-                name: "💰 Payment",
-                value: `Subtotal: Rs ${cleanSubtotal}\nDelivery: Rs ${cleanDeliveryCharge}\n**Total: Rs ${cleanTotal}**`,
-                inline: true
-              },
-              {
-                name: "📍 Delivery Info",
-                value: `**Area:** ${cleanArea}\n**Address:** ${cleanAddress.substring(0, 200)}`,
-                inline: true
-              }
+              { name: '👤 Customer', value: cleanCustomerName, inline: true },
+              { name: '📞 Phone', value: cleanCustomerPhone, inline: true },
+              { name: '📍 Area', value: cleanArea, inline: true },
+              { name: '🛍️ Items', value: itemsList.substring(0, 1024) }, // Discord limit
+              { name: '💰 Subtotal', value: `Rs ${cleanSubtotal}`, inline: true },
+              { name: '🚚 Delivery', value: `Rs ${cleanDeliveryCharge}`, inline: true },
+              { name: '💵 Total', value: `**Rs ${cleanTotal}**`, inline: true },
+              { name: '🏠 Address', value: cleanAddress.substring(0, 100) }
             ],
-            footer: {
-              text: "Sam's Kitchen - Premium Frozen Snacks",
-              icon_url: "logo.jpg"
-            },
             timestamp: new Date().toISOString()
           }]
         })
@@ -793,36 +774,26 @@ app.get('/api/orders/:orderNumber', async (req, res) => {
 });
 
 // Update order status
-// Update order status
 app.patch('/api/orders/:orderNumber/status', async (req, res) => {
   const { status } = req.body;
-  
+  const validStatuses = ['pending', 'confirmed', 'preparing', 'out-for-delivery', 'delivered', 'cancelled'];
+
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ success: false, error: 'Invalid status' });
+  }
+
   try {
     await pool.execute(
       'UPDATE orders SET status = ? WHERE order_number = ?',
       [status, req.params.orderNumber]
     );
-
-    // Notify Discord of status change
-    await fetch(process.env.DISCORD_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: "🍴 Sam's Kitchen",
-        embeds: [{
-          title: `📦 Order #${req.params.orderNumber} Updated`,
-          description: `Status changed to: **${status.toUpperCase()}**`,
-          color: status === 'delivered' ? 0x00ff00 : 0xffa500,
-          timestamp: new Date().toISOString()
-        }]
-      })
-    });
-
-    res.json({ success: true, message: 'Status updated' });
+    res.json({ success: true, message: 'Order status updated' });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error updating order status:', error);
+    res.status(500).json({ success: false, error: 'Failed to update status' });
   }
 });
+
 // Get daily sales report
 app.get('/api/reports/daily-sales', async (req, res) => {
   try {
