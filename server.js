@@ -12,6 +12,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // ============================================
@@ -27,7 +28,6 @@ app.use(express.urlencoded({ extended: true }));
 // ============================================
 // SERVE FRONTEND STATIC FILES
 // ============================================
-app.use(express.static(path.join(__dirname, '../app/dist')));
 
 // Rate limiting to prevent spam
 const orderLimiter = rateLimit({
@@ -713,16 +713,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler - Serve React app for any non-API routes
+
+// 404 for API only
 app.use((req, res) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ success: false, error: 'API route not found' });
-  }
-  res.sendFile(path.join(__dirname, '../app/dist/index.html'));
-});
-// ✅ Health check endpoint HERE
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.status(404).json({ success: false, error: 'API route not found' });
 });
 
 // ============================================
