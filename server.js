@@ -64,7 +64,20 @@ async function testDBConnection() {
   }
 }
 
+
 testDBConnection();
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    await connection.query('SELECT 1');
+    connection.release();
+    res.json({ success: true, message: 'Database connected' });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+
 
 // ============================================
 // EMAIL CONFIGURATION
