@@ -40,22 +40,12 @@ const orderLimiter = rateLimit({
 // DATABASE CONNECTION
 // ============================================
 
-console.log('Checking database configuration...');
-console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_USER:', process.env.DB_USER);
+const DATABASE_URL = process.env.DATABASE_URL || 'mysql://root:XAjyNtCGTbUAAPmVayZdnSUcbeVUBscg@mysql.railway.internal:3306/railway';
 
-const pool = process.env.DATABASE_URL 
-  ? mysql.createPool(process.env.DATABASE_URL)
-  : mysql.createPool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0
-    });
+console.log('Connecting to database...');
+console.log('DATABASE_URL set:', !!process.env.DATABASE_URL);
+
+const pool = mysql.createPool(DATABASE_URL);
 
 // Test database connection with better error logging
 async function testDBConnection() {
@@ -71,6 +61,7 @@ async function testDBConnection() {
 }
 
 testDBConnection();
+
 
 
 // ============================================
