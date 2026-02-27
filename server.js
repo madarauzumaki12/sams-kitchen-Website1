@@ -39,6 +39,12 @@ const orderLimiter = rateLimit({
 // ============================================
 // DATABASE CONNECTION
 // ============================================
+
+console.log('Checking database configuration...');
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+
 const pool = process.env.DATABASE_URL 
   ? mysql.createPool(process.env.DATABASE_URL)
   : mysql.createPool({
@@ -51,8 +57,7 @@ const pool = process.env.DATABASE_URL
       queueLimit: 0
     });
 
-
-// Test database connection
+// Test database connection with better error logging
 async function testDBConnection() {
   try {
     const connection = await pool.getConnection();
@@ -60,13 +65,12 @@ async function testDBConnection() {
     connection.release();
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
+    console.error('Full error:', error);
     console.log('⚠️  Running in mock mode (no database)');
   }
 }
 
-
 testDBConnection();
-
 
 
 // ============================================
