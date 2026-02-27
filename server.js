@@ -137,16 +137,13 @@ app.get('/api/setup-db', async (req, res) => {
 
 
 
-// ============================================
-// EMAIL CONFIGURATION
-// ============================================
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.EMAIL_USER,      // muzzammil.memons@gmail.com
+    pass: process.env.EMAIL_PASS       // App password (16 chars)
   },
   tls: {
     rejectUnauthorized: false
@@ -667,11 +664,11 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
       notes: cleanNotes
     };
 
-      /**   try {
+        try {
       await sendOrderEmails(orderData, normalizedItems);
     } catch (emailError) {
       console.error('Order email send failed:', emailError.message);
-    }**/
+    }
    // Send to Discord
     // Send to Discord
     try {
