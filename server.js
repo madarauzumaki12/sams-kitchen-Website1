@@ -661,13 +661,11 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
       notes: cleanNotes
     };
 
-       // Skip email for now
-    console.log('Skipping email, order created:', orderNumber);
-    // try {
-    //   await sendOrderEmails(orderData, normalizedItems);
-    // } catch (emailError) {
-    //   console.error('Order email send failed');
-    // }
+        try {
+      await sendOrderEmails(orderData, normalizedItems);
+    } catch (emailError) {
+      console.error('Order email send failed:', emailError.message);
+    }
 
     await connection.commit();
 
