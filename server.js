@@ -501,6 +501,17 @@ app.get('/api/db-test', async (req, res) => {
     res.json({ success: false, error: error.message });
   }
 });
+app.get('/api/check-tables', async (req, res) => {
+  try {
+    const [tables] = await pool.execute('SHOW TABLES');
+    res.json({ 
+      success: true, 
+      tables: tables.map(t => Object.values(t)[0])
+    });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
 
 
 // ============================================
