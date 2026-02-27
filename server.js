@@ -661,11 +661,38 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
       notes: cleanNotes
     };
 
-        try {
+      /**   try {
       await sendOrderEmails(orderData, normalizedItems);
     } catch (emailError) {
       console.error('Order email send failed:', emailError.message);
-    }
+    }**/
+   // Send to Discord
+try {
+  await fetch(process.env.DISCORD_WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: "Sam's Kitchen Bot",
+      avatar_url: "https://your-logo-url.png",
+      embeds: [{
+        title: `🛒 New Order #${orderNumber}`,
+        color: 0x8e5d3d,  // Brown color
+        fields: [
+          { name: '👤 Customer', value: cleanCustomerName, inline: true },
+          { name: '📞 Phone', value: cleanCustomerPhone, inline: true },
+          { name: '📍 Area', value: cleanArea, inline: true },
+          { name: '💰 Total', value: `Rs ${cleanTotal}`, inline: true },
+          { name: '📦 Items', value: normalizedItems.length.toString(), inline: true },
+          { name: '🏠 Address', value: cleanAddress.substring(0, 100) }
+        ],
+        timestamp: new Date().toISOString()
+      }]
+    })
+  });
+  console.log('✅ Discord notification sent');
+} catch (discordError) {
+  console.error('Discord error:', discordError.message);
+}
 
     await connection.commit();
 
