@@ -61,6 +61,79 @@ async function testDBConnection() {
 }
 
 testDBConnection();
+// Temporary database setup route
+app.get('/api/setup-db', async (req, res) => {
+  try {
+    // Create orders table
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        order_number VARCHAR(50) UNIQUE NOT NULL,
+        customer_name VARCHAR(255) NOT NULL,
+        customer_phone VARCHAR(50) NOT NULL,
+        customer_email VARCHAR(255),
+        address TEXT NOT NULL,
+        area VARCHAR(100) NOT NULL,
+        subtotal DECIMAL(10,2) NOT NULL,
+        delivery_charge DECIMAL(10,2) NOT NULL,
+        total DECIMAL(10,2) NOT NULL,
+        notes TEXT,
+        status ENUM('pending', 'confirmed', 'preparing', 'out-for-delivery', 'delivered', 'cancelled') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create order_items table
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS order_items (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        order_id INT NOT NULL,
+        product_id INT,
+        name VARCHAR(255) NOT NULL,
+        price DECIMAL(10,2) NOT NULL,
+        quantity INT NOT NULL,
+        item_type VARCHAR(50) DEFAULT 'product',
+        variant VARCHAR(255),
+        deal_items JSON,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+      )
+    `);
+
+    // Create products table
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10,2) NOT NULL,
+        image VARCHAR(500),
+        category VARCHAR(100),
+        in_stock BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create deals table
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS deals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10,2) NOT NULL,
+        image VARCHAR(500),
+        items_included TEXT,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    res.json({ success: true, message: 'Database tables created successfully!' });
+  } catch (error) {
+    console.error('Setup error:', error);
+    res.json({ success: false, error: error.message });
+  }
+});
 
 
 
