@@ -671,7 +671,7 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
     }
    // Send to Discord
     // Send to Discord
-    try {
+    /**try {
       // Format items list
       const itemsList = normalizedItems.map(item => 
         `• ${item.name} x${item.quantity} - Rs ${item.price * item.quantity}`
@@ -702,7 +702,7 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
       console.log('✅ Discord notification sent');
     } catch (discordError) {
       console.error('Discord error:', discordError.message);
-    }
+    }**/
     await connection.commit();
 
     res.status(201).json({
