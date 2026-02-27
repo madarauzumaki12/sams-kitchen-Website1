@@ -668,18 +668,20 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
         status: 'pending'
       }
     });
-  } catch (error) {
+    } catch (error) {
     try {
       await connection.rollback();
     } catch (rollbackError) {
-      console.error('Order rollback failed');
+      console.error('Order rollback failed:', rollbackError.message);
     }
-    console.error('Order creation failed');
+    console.error('❌ Order creation failed:', error.message);
+    console.error('Full error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to create order. Please try again.'
+      error: 'Failed to create order: ' + error.message
     });
-  } finally {
+  }
+   finally {
     if (connection) connection.release();
   }
 });
